@@ -16,5 +16,18 @@ public class AppTest
     public void shouldAnswerWithTrue()
     {
         assertTrue( true );
+        t();
+    }
+
+    static void t() {
+        try {
+            System.out.println("start");
+            throw new Exception("s");
+        } catch (Exception e) {
+            System.out.println("e");
+            return;
+        } finally {
+            System.out.println("final");
+        }
     }
 }
