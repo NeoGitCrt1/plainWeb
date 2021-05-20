@@ -23,6 +23,13 @@ public class HelloService implements IHelloService {
                 //
                 log.error(">>", throwables);
             }
+        }, () -> {
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                //
+            }
+            log.info("hook end");
         }, IllegalArgumentException.class);
         return "mahalo " + name;
     }

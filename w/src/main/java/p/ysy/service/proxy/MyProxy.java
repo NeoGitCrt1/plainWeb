@@ -1,6 +1,5 @@
 package p.ysy.service.proxy;
 
-import p.ysy.controller.MessageServlet;
 import p.ysy.service.HelloService;
 import p.ysy.service.IHelloService;
 

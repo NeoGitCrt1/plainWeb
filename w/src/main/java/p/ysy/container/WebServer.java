@@ -7,10 +7,12 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.PathHandler;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.DeploymentManager;
-import p.ysy.controller.MahaloServlet;
-import p.ysy.controller.MessageServlet;
+import io.undertow.servlet.api.InstanceHandle;
+import p.ysy.controller.IController;
 
+import javax.servlet.Servlet;
 import javax.servlet.ServletException;
+import java.util.ServiceLoader;
 
 import static io.undertow.servlet.Servlets.*;
 
@@ -22,14 +24,27 @@ public class WebServer {
         DeploymentInfo servletBuilder = deployment()
                 .setContextPath(MYAPP)
                 .setDeploymentName("a")
-                .setClassLoader(WebServer.class.getClassLoader())
-                .addServlets(
-                        servlet("MyServlet", MessageServlet.class)
-                                .addInitParam("message", "MyServlet")
-                                .addMapping("/myservlet"),
-                        servlet("mahalo", MahaloServlet.class)
-                                .addInitParam("message", "mahalo")
-                                .addMapping("/mahalo"));
+                .setClassLoader(WebServer.class.getClassLoader());
+//        .addServlets(
+//                servlet("MyServlet", MessageServlet.class)
+//                        .addInitParam("message", "MyServlet")
+//                        .addMapping("/myservlet"),
+//                servlet("mahalo", MahaloServlet.class)
+//                        .addInitParam("message", "mahalo")
+//                        .addMapping("/mahalo"));
+        ServiceLoader<IController> cList = ServiceLoader.load(IController.class);
+        cList.forEach( c -> {
+            servletBuilder.addServlet(
+                    servlet(c.getClass().getName(), c.getClass(), () -> new InstanceHandle<Servlet>(){
+                        @Override
+                        public IController getInstance() {
+                            return c;
+                        }
+                        @Override
+                        public void release() { }
+                    }).addMapping(c.path())
+            );
+        });
 
         DeploymentManager manager = defaultContainer().addDeployment(servletBuilder);
         manager.deploy();

@@ -1,8 +1,6 @@
 package p.ysy.controller;
 
 
-import p.ysy.container.WebServer;
-import p.ysy.service.HelloService;
 import p.ysy.service.proxy.MyProxy;
 
 import javax.servlet.ServletConfig;
@@ -12,10 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-/**
- * @author Stuart Douglas
- */
-public class MessageServlet extends BaseController {
+public class MessageServlet extends BaseController implements IController {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MessageServlet.class);
 
     public static final String MESSAGE = "message";
@@ -26,7 +21,7 @@ public class MessageServlet extends BaseController {
     public void init(final ServletConfig config) throws ServletException {
         super.init(config);
         message = config.getInitParameter(MESSAGE);
-        log.info(message);
+        log.info("init>> :{}", message);
     }
 
     @Override
@@ -36,5 +31,10 @@ public class MessageServlet extends BaseController {
         PrintWriter writer = resp.getWriter();
         writer.write(MyProxy.helloService.hi(d));
         writer.close();
+    }
+
+    @Override
+    public String path() {
+        return "/mahalo";
     }
 }
